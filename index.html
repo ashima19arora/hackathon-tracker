@@ -167,6 +167,7 @@ function load(){
     rows=r[0].data;ups=r[1].data;renderApp();renderModal()})}
 function later(){clearTimeout(timer);timer=setTimeout(load,300)}
 function showApp(){
+  document.getElementById('tw').appendChild(document.getElementById('theme'));
   root.innerHTML='<header><h1>Hackathons</h1><div class="hr" id="hr"><button class="out" id="out">Sign out</button></div></header><div id="app"><div class="msg">Loading…</div></div>';
   document.getElementById('hr').insertBefore(document.getElementById('theme'),document.getElementById('out'));
   document.getElementById('out').onclick=function(){sb.auth.signOut()};
