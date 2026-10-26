@@ -14,7 +14,7 @@
 
 Deadlines, registrations, tracks and progress updates for every hackathon your team is chasing, in one shared space that updates live on everyone's screen.
 
-**[Try it live](https://hackathon-winners-plum.vercel.app)** 
+**[Try it live](https://hackathon-winners-plum.vercel.app)** · **[Schema](schema.sql)**
 
 </div>
 
@@ -28,13 +28,15 @@ Questions like "who registered us for this?", "is the PPT due on the 27th or the
 
 ## What you get
 
-| Feature | Description |
+| | |
 |---|---|
 | **Phase board** | Hackathons grouped by timeline: what's due now, the next two weeks, and later. |
 | **Live sync** | An edit on one laptop appears on every other screen instantly, with no refresh. |
 | **Updates feed** | Timestamped, named comments on each hackathon, so progress is never lost in chat. |
 | **Deadline badges** | Countdown chips on every date and a "next up" strip for the closest deadline. |
 | **Decide fast** | Sort by nearest deadline or by registrant count when you can only pick one. |
+| **Auto-refreshed registrants** | Counts update every 6 hours from Devpost, Unstop and other event pages. |
+| **Light and dark** | Follows your system theme, or switch with one tap. |
 | **Team only** | Sign-in with an email allowlist, enforced inside the database itself. |
 
 ## How it works
@@ -104,7 +106,7 @@ Use "Move to..." when a hackathon shifts phase, or "+" next to a column to add a
 
 ## Getting started
 
-**Try it live:** [your-link.vercel.app](https://your-link.vercel.app)
+**Try it live:** [hackathon-winners-plum.vercel.app](https://hackathon-winners-plum.vercel.app)
 
 **Or run your own copy:**
 
@@ -120,9 +122,27 @@ To add a teammate later:
 insert into team_members (email) values ('their@email.com');
 ```
 
+## Auto-refreshing registrants
+
+A GitHub Actions workflow (`.github/workflows/refresh-registrants.yml`) runs `scripts/refresh-registrants.mjs` every 6 hours:
+
+1. **Devpost** pages are read directly.
+2. **Unstop** counts come from Unstop's public opportunity API.
+3. **Any other site**, or a page that loads its numbers with JavaScript, is sent to [Tavily Extract](https://tavily.com), which renders the page, in one batched call.
+
+The count and an "as of" date are written back to Supabase, and every open tracker updates live. Add these as repository secrets (Settings > Secrets and variables > Actions):
+
+| Secret | Value |
+|---|---|
+| `SUPABASE_URL` | Your project URL |
+| `SUPABASE_SERVICE_KEY` | The secret / service_role key (never put this in a file) |
+| `TAVILY_API_KEY` | Optional, from tavily.com. Without it, only Devpost and Unstop are refreshed. |
+
+Run it manually from the Actions tab with **Run workflow**.
+
 ## Future Work
 
-- **Auto-refresh registrants** from Devpost and Unstop pages on a schedule.
+- **Smarter count detection** for event pages that don't show registrants in a standard format, so more sites refresh automatically.
 - **Deadline reminders** by email a day before each submission.
 - **Submission links** for the PPT, repo and demo video on each card.
 - **Archive** for finished hackathons, with results.
