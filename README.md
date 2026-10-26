@@ -1,41 +1,71 @@
 # Hackathon Tracker
 
-A real-time, collaborative tracker that helps a student team manage several hackathons at once: deadlines, registrations, tracks and progress updates in one shared place.
+A real-time board for teams running several hackathons in parallel. Deadlines, registrations, tracks and progress updates live in one place and sync instantly across every teammate's screen.
 
-Built because our team was juggling 6+ hackathons with overlapping deadlines across WhatsApp chats and scattered notes.
+**Live:** https://your-link.vercel.app
+
+---
 
 ## Features
 
-- **Phase-based board**: hackathons grouped by timeline (this week / next two weeks / later), so the team always knows what to focus on now.
-- **Live sync**: edits and updates appear instantly for every teammate via Supabase Realtime. No refresh needed.
-- **Updates feed per hackathon**: timestamped comments showing who did what.
-- **Deadline badges**: countdown chips ("in 4d") and a "next up" strip for the closest deadline.
-- **Decision support**: sort by nearest deadline or registrant count to pick between competing events.
-- **Team-only access**: email/password auth with an allowlist. Only listed teammates can read or write.
+| | |
+|---|---|
+| Phase board | Hackathons grouped by timeline: current, next two weeks, later |
+| Live sync | Every edit and update appears for all teammates without a refresh |
+| Updates feed | Timestamped, attributed comments on each hackathon |
+| Deadline badges | Countdown chips and a "next up" strip for the closest deadline |
+| Sorting | By nearest deadline or registrant count |
+| Team-only access | Email auth with an allowlist enforced in the database |
 
 ## Tech Stack
 
-- **Frontend:** HTML, CSS, vanilla JavaScript (single page, no build step)
-- **Backend:** Supabase (PostgreSQL, Auth, Realtime)
-- **Security:** Postgres Row Level Security policies backed by a `security definer` membership function
-- **Hosting:** Vercel, auto-deployed from GitHub
+| Layer | Technology |
+|---|---|
+| Frontend | HTML, CSS, vanilla JavaScript (no build step) |
+| Database | Supabase PostgreSQL |
+| Auth | Supabase Auth (email and password) |
+| Realtime | Supabase Realtime (Postgres change streams) |
+| Security | Row Level Security policies |
+| Hosting | Vercel, deployed from GitHub |
 
-## How It Works
+## Architecture
 
-- `team_members` stores the allowed emails.
-- `is_member()` checks the signed-in user's JWT email against that list.
-- RLS policies on `hackathons` and `updates` allow access only when `is_member()` is true, so security is enforced in the database, not just the UI.
-- The client subscribes to Postgres changes and re-renders on every insert/update/delete.
+```
+ Browser (index.html)
+     │  supabase-js
+     ▼
+ Supabase
+ ├── Auth ─────────── issues JWT with user email
+ ├── PostgreSQL
+ │   ├── team_members   allowlist of emails
+ │   ├── hackathons     one row per event
+ │   ├── updates        comments, linked to a hackathon
+ │   └── RLS: access only if is_member() is true
+ └── Realtime ─────── pushes row changes to all clients
+```
+
+## Data Model
+
+| Table | Purpose | Key columns |
+|---|---|---|
+| `team_members` | Who can access the board | `email` |
+| `hackathons` | Event details | `name`, `phase`, `submit_date`, `round_date`, `regs`, `registrar`, `track`, `link` |
+| `updates` | Progress comments | `hackathon_id`, `body`, `author_name`, `created_at` |
+
+## Security
+
+Access control lives in Postgres, not the frontend. `is_member()` is a `security definer` function that checks the email in the user's JWT against `team_members`. RLS policies on `hackathons` and `updates` allow reads and writes only when it returns true. A signed-up user who is not on the list gets no data, even with direct API access.
 
 ## Setup
 
-1. Create a Supabase project and run `schema.sql` in the SQL Editor (add your team's emails first).
-2. In Authentication → Email, turn off "Confirm email".
-3. Paste your Project URL and anon key into `index.html`.
-4. Deploy the repo on Vercel.
+1. Create a Supabase project.
+2. Add your team's emails to `schema.sql` and run it in the SQL Editor.
+3. Under Authentication > Sign In / Providers > Email, turn off "Confirm email".
+4. Put your Project URL and anon key into `index.html`.
+5. Import the repo into Vercel and deploy.
 
 ## Future Work
 
 - Auto-refresh registrant counts from event pages
-- Deadline reminders by email
-- File/PPT links per submission
+- Email reminders before deadlines
+- Submission links (PPT, repo, demo) per hackathon
