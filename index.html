@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Hackathons</title>
+<style>
+:root{--bg:#f5f5f7;--card:#fff;--ink:#1d1d1f;--mute:#86868b;--line:rgba(0,0,0,.08);--fill:rgba(0,0,0,.05);--blue:#0071e3;--red:#d70015;--scrim:rgba(0,0,0,.35);color-scheme:light dark}
+@media (prefers-color-scheme:dark){:root{--bg:#000;--card:#1c1c1e;--ink:#f5f5f7;--mute:#98989d;--line:rgba(255,255,255,.1);--fill:rgba(255,255,255,.08);--blue:#0a84ff;--red:#ff453a;--scrim:rgba(0,0,0,.6)}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.4 -apple-system,BlinkMacSystemFont,"SF Pro Text","Segoe UI","Helvetica Neue",Arial,sans-serif;-webkit-font-smoothing:antialiased;padding:32px 20px 64px}
+.wrap{max-width:1000px;margin:0 auto}
+header{display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:28px;gap:12px}
+h1{font-size:34px;letter-spacing:-.02em;font-weight:700;margin:0}
+.out{border:0;background:transparent;color:var(--blue);cursor:pointer;font-size:14px;padding:0}
+section{margin-bottom:36px}
+.lh{display:flex;justify-content:space-between;align-items:center;padding:0 4px 12px}
+.lh h2{font-size:21px;font-weight:600;letter-spacing:-.01em;margin:0}
+.plus{border:0;background:var(--fill);color:var(--blue);width:30px;height:30px;border-radius:50%;font-size:20px;line-height:1;cursor:pointer;padding:0}
+.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
+@media (max-width:760px){.grid{grid-template-columns:1fr}}
+.card{background:var(--card);border-radius:18px;padding:18px;box-shadow:0 1px 2px rgba(0,0,0,.04)}
+.empty{color:var(--mute);font-size:14px;padding:4px}
+input,select,textarea,button{font:inherit;color:inherit}
+.top{display:flex;gap:10px;align-items:flex-start;justify-content:space-between}
+.nm{flex:1;min-width:0;border:0;background:transparent;font-size:18px;font-weight:600;letter-spacing:-.01em;padding:2px 0}
+.pill{border:0;border-radius:99px;padding:4px 10px;font-size:12px;font-weight:600;cursor:pointer;background:var(--fill);color:var(--mute);-webkit-appearance:none;appearance:none;text-align:center}
+.pill[data-s="Registered"]{background:rgba(0,113,227,.12);color:var(--blue)}
+.pill[data-s="In progress"]{background:rgba(255,149,0,.15);color:#c77700}
+.pill[data-s="Submitted"]{background:rgba(52,199,89,.16);color:#1e8e3e}
+.pill[data-s="Dropped"]{background:rgba(255,59,48,.12);color:var(--red)}
+.rows{margin-top:10px}
+.r{display:grid;grid-template-columns:96px 1fr auto;align-items:center;gap:8px;padding:8px 0;border-top:1px solid var(--line)}
+.r label{color:var(--mute);font-size:13px}
+.r input{border:0;background:transparent;padding:2px 0;min-width:0;width:100%}
+.r input::placeholder{color:var(--mute);opacity:.6}
+.rel{font-size:12px;color:var(--mute);white-space:nowrap}
+.rel.hot{color:var(--red);font-weight:600}
+.r a{color:var(--blue);text-decoration:none;font-size:13px}
+input:focus,textarea:focus{outline:0}
+.r input:focus,.notes:focus{background:var(--fill);border-radius:6px}
+.notes{width:100%;border:0;background:transparent;resize:vertical;min-height:52px;padding:10px 0 2px;font-size:14px;color:var(--mute);border-top:1px solid var(--line)}
+.ft{display:flex;justify-content:space-between;align-items:center;margin-top:8px;padding-top:10px;border-top:1px solid var(--line);gap:8px;flex-wrap:wrap}
+.lnk{border:0;background:transparent;color:var(--blue);cursor:pointer;padding:0;font-size:14px}
+.lnk.d{color:var(--red)}
+.mv{border:0;background:transparent;color:var(--mute);font-size:13px;cursor:pointer;-webkit-appearance:none;appearance:none}
+.last{font-size:13px;color:var(--mute);margin-top:8px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.last b{color:var(--ink);font-weight:600}
+.ov{position:fixed;inset:0;background:var(--scrim);display:flex;align-items:center;justify-content:center;padding:20px;z-index:20;-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px)}
+.ov[hidden]{display:none}
+.sheet{background:var(--card);border-radius:22px;width:100%;max-width:520px;max-height:min(680px,90vh);display:flex;flex-direction:column;box-shadow:0 20px 60px rgba(0,0,0,.25)}
+.sh{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;padding:20px 20px 12px}
+.sh h3{margin:0;font-size:19px;letter-spacing:-.01em}
+.sh p{margin:2px 0 0;font-size:13px;color:var(--mute)}
+.done{border:0;background:transparent;color:var(--blue);font-weight:600;cursor:pointer;font-size:15px}
+.mb{padding:0 20px;overflow-y:auto;flex:1;min-height:120px}
+.up{padding:12px 14px;background:var(--fill);border-radius:14px;margin-bottom:8px;font-size:14px;white-space:pre-wrap;word-break:break-word}
+.up small{color:var(--mute);display:block;margin-bottom:2px;white-space:normal}
+.up small b{color:var(--ink)}
+.mf{display:flex;gap:8px;align-items:flex-end;padding:12px 20px 20px}
+.mf textarea{flex:1;border:0;background:var(--fill);border-radius:14px;padding:10px 12px;min-height:44px;max-height:140px;resize:none;font-size:15px}
+.post,.go{border:0;background:var(--blue);color:#fff;border-radius:99px;padding:9px 16px;cursor:pointer;font-weight:600}
+.msg{color:var(--mute);padding:24px 4px}
+.auth{max-width:380px;margin:12vh auto 0;background:var(--card);border-radius:22px;padding:28px}
+.auth h1{font-size:28px;margin-bottom:6px}
+.auth p{color:var(--mute);margin:0 0 18px}
+.auth input{width:100%;border:0;background:var(--fill);border-radius:12px;padding:12px 14px;margin-bottom:10px}
+.auth .go{width:100%;padding:12px;margin-top:4px}
+.auth .sw{display:block;text-align:center;margin-top:14px}
+.err{color:var(--red);font-size:13px;min-height:18px;margin-top:6px}
+</style>
+</head>
+<body>
+<div class="wrap" id="root"></div>
+<div class="ov" id="ov" hidden>
+  <div class="sheet" role="dialog" aria-modal="true">
+    <div class="sh"><div><h3 id="mt"></h3><p>Team updates</p></div><button class="done" data-act="close">Done</button></div>
+    <div class="mb" id="mb"></div>
+    <div class="mf"><textarea id="nt" rows="1" placeholder="Share an update with the team"></textarea><button class="post" data-act="post">Post</button></div>
+  </div>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
+<script>
+// 1. Paste your Supabase values here (Project settings > API). The anon key is safe to publish.
+var SUPABASE_URL='https://gtjzvledfuluosxznujc.supabase.co';
+var SUPABASE_ANON_KEY='sb_publishable_k-nqIdyCSp005PYz3ui2gw_R1W522PC';
+
+(function(){
+var root=document.getElementById('root');
+if(SUPABASE_URL.indexOf('PASTE')===0){root.innerHTML='<div class="msg">Add your Supabase URL and anon key at the top of index.html. The README has the steps.</div>';return}
+var sb=supabase.createClient(SUPABASE_URL,SUPABASE_ANON_KEY);
+var me=null,rows=[],ups=[],modalId=null,pending=false,timer=null,signup=false;
+var LANES=[{k:'a',t:'Until 31 Oct'},{k:'b',t:'1–15 Nov'},{k:'c',t:'After 15 Nov'}];
+var STAT=['Registered','In progress','Submitted','Dropped'];
+var MON=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+function esc(s){return String(s==null?'':s).replace(/[&<>"]/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]})}
+function today(){var d=new Date();return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')}
+function daysTo(d){return Math.round((new Date(d+'T00:00:00')-new Date(today()+'T00:00:00'))/864e5)}
+function nextDate(r){var t=today();var c=[r.submit_date,r.round_date].filter(function(d){return d&&d>=t}).sort();return c[0]||null}
+function rel(d){if(!d)return'<span></span>';var n=daysTo(d);if(n<0)return'<span class="rel">passed</span>';if(n===0)return'<span class="rel hot">today</span>';return'<span class="rel'+(n<=3?' hot':'')+'">'+(n===1?'tomorrow':'in '+n+' days')+'</span>'}
+function fmtT(t){var d=new Date(t);return d.getDate()+' '+MON[d.getMonth()]}
+function fmtD(s){var p=s.split('-');return(+p[2])+' '+MON[+p[1]-1]}
+function inp(r,f,type,ph,extra){return'<input class="c" data-id="'+r.id+'" data-f="'+f+'" type="'+type+'" value="'+esc(r[f])+'" placeholder="'+(ph||'')+'"'+(extra||'')+'>'}
+function row(l,body,side){return'<div class="r"><label>'+l+'</label>'+body+(side||'<span></span>')+'</div>'}
+function thread(id){return ups.filter(function(u){return u.hackathon_id===id}).sort(function(a,b){return new Date(b.created_at)-new Date(a.created_at)})}
+function card(r){
+  var u=thread(r.id),l=u[0],s=r.status||'';
+  return'<div class="card"><div class="top"><input class="c nm" data-id="'+r.id+'" data-f="name" value="'+esc(r.name)+'" placeholder="Name">'+
+   '<select class="c pill" data-id="'+r.id+'" data-f="status" data-s="'+esc(s)+'"><option value="">Status</option>'+STAT.map(function(x){return'<option'+(x===s?' selected':'')+'>'+x+'</option>'}).join('')+'</select></div><div class="rows">'+
+   row('Link',inp(r,'link','url','Paste link'),r.link?'<a href="'+esc(r.link)+'" target="_blank" rel="noopener">Open</a>':'')+
+   row('Organizer',inp(r,'organizer','text','Who’s hosting?'))+
+   row('Submission',inp(r,'submit_date','date'),rel(r.submit_date))+
+   row('Round',inp(r,'round_date','date'),rel(r.round_date))+
+   row('Registrants',inp(r,'regs','number','–',' min="0"'),r.regs_at&&r.regs!=null?'<span class="rel">as of '+fmtD(r.regs_at)+'</span>':'')+
+   row('Registering',inp(r,'registrar','text','Who?'))+
+   row('Mode',inp(r,'mode','text','Online / offline'))+
+   row('Prize',inp(r,'prize','text','–'))+
+   row('Track',inp(r,'track','text','–'))+
+   '</div><textarea class="c notes" data-id="'+r.id+'" data-f="details" placeholder="Notes">'+esc(r.details)+'</textarea>'+
+   (l?'<div class="last"><b>'+esc(l.author_name||'Someone')+'</b> '+esc(l.body)+'</div>':'')+
+   '<div class="ft"><button class="lnk" data-act="mod" data-id="'+r.id+'">Updates'+(u.length?' ('+u.length+')':'')+'</button><span>'+
+   '<select class="c mv" data-id="'+r.id+'" data-f="phase"><option value="">Move to…</option>'+LANES.map(function(x){return'<option value="'+x.k+'">'+x.t+'</option>'}).join('')+'</select> <button class="lnk d" data-act="del" data-id="'+r.id+'">Delete</button></span></div></div>'}
+function renderApp(){
+  var app=document.getElementById('app');if(!app)return;
+  var ae=document.activeElement;
+  if(ae&&app.contains(ae)&&(ae.tagName==='INPUT'||ae.tagName==='TEXTAREA')){pending=true;return}
+  pending=false;var h='';
+  LANES.forEach(function(L){
+    var list=rows.filter(function(r){return r.phase===L.k}).sort(function(a,b){return(nextDate(a)||'9999').localeCompare(nextDate(b)||'9999')||a.sort_order-b.sort_order});
+    h+='<section><div class="lh"><h2>'+L.t+'</h2><button class="plus" data-act="new" data-id="'+L.k+'" aria-label="Add hackathon">+</button></div>'+
+      (list.length?'<div class="grid">'+list.map(card).join('')+'</div>':'<div class="empty">Nothing here yet.</div>')+'</section>'});
+  app.innerHTML=h}
+function renderModal(){
+  var ov=document.getElementById('ov');
+  var r=modalId&&rows.filter(function(x){return x.id===modalId})[0];
+  if(!r){modalId=null;ov.hidden=true;return}
+  ov.hidden=false;
+  document.getElementById('mt').textContent=r.name||'Untitled';
+  var u=thread(modalId);
+  document.getElementById('mb').innerHTML=u.length?u.map(function(x){return'<div class="up"><small><b>'+esc(x.author_name||'Someone')+'</b> · '+fmtT(x.created_at)+'</small>'+esc(x.body)+'</div>'}).join(''):'<div class="empty">No updates yet. Post what changed, who is doing what, or any comments.</div>'}
+function load(){
+  return Promise.all([sb.from('hackathons').select('*'),sb.from('updates').select('*')]).then(function(r){
+    if(r[0].error||r[1].error){document.getElementById('app').innerHTML='<div class="msg">Could not load the tracker. Check the schema was run.</div>';return}
+    rows=r[0].data;ups=r[1].data;renderApp();renderModal()})}
+function later(){clearTimeout(timer);timer=setTimeout(load,300)}
+function showApp(){
+  root.innerHTML='<header><h1>Hackathons</h1><button class="out" id="out">Sign out</button></header><div id="app"><div class="msg">Loading…</div></div>';
+  document.getElementById('out').onclick=function(){sb.auth.signOut()};
+  sb.rpc('is_member').then(function(r){
+    if(!r.data){document.getElementById('app').innerHTML='<div class="msg">You’re signed in as '+esc(me.email)+', but this email isn’t on the team list yet. Ask Ashima to add it.</div>';return}
+    load();
+    sb.channel('tracker').on('postgres_changes',{event:'*',schema:'public',table:'hackathons'},later).on('postgres_changes',{event:'*',schema:'public',table:'updates'},later).subscribe()})}
+function showAuth(msg){
+  root.innerHTML='<div class="auth"><h1>Hackathons</h1><p>'+(signup?'Create your account with the email your team added.':'Sign in to see the team tracker.')+'</p>'+
+   (signup?'<input id="nm" placeholder="Your name" autocomplete="name">':'')+
+   '<input id="em" type="email" placeholder="Email" autocomplete="email"><input id="pw" type="password" placeholder="Password" autocomplete="'+(signup?'new-password':'current-password')+'">'+
+   '<button class="go" id="go">'+(signup?'Create account':'Sign in')+'</button><div class="err" id="er">'+esc(msg||'')+'</div>'+
+   '<button class="out sw" id="sw">'+(signup?'I already have an account':'Create an account')+'</button></div>';
+  document.getElementById('sw').onclick=function(){signup=!signup;showAuth()};
+  document.getElementById('go').onclick=function(){
+    var em=document.getElementById('em').value.trim(),pw=document.getElementById('pw').value,nm=signup?document.getElementById('nm').value.trim():'';
+    if(!em||!pw||(signup&&!nm)){document.getElementById('er').textContent='Fill in every field.';return}
+    var p=signup?sb.auth.signUp({email:em,password:pw,options:{data:{full_name:nm}}}):sb.auth.signInWithPassword({email:em,password:pw});
+    p.then(function(r){if(r.error){document.getElementById('er').textContent=r.error.message}else if(signup&&!r.data.session){document.getElementById('er').textContent='Check your email to confirm your account, then sign in.'}})}}
+document.addEventListener('change',function(e){
+  var t=e.target;if(!t.classList.contains('c')||!me)return;
+  var f=t.getAttribute('data-f'),v=t.value,o={};
+  if(f==='phase'&&!v)return;
+  if(f==='regs'){v=v===''?null:Number(v);o.regs_at=today()}
+  if((f==='submit_date'||f==='round_date')&&v==='')v=null;
+  o[f]=v;
+  sb.from('hackathons').update(o).eq('id',t.getAttribute('data-id')).then(function(r){if(r.error)alert('Could not save that change.')})});
+document.addEventListener('focusout',function(){setTimeout(function(){if(pending)renderApp()},50)});
+document.addEventListener('keydown',function(e){if(e.key==='Escape'&&modalId){modalId=null;renderModal()}});
+document.addEventListener('click',function(e){
+  if(e.target.id==='ov'){modalId=null;renderModal();return}
+  var b=e.target.closest('[data-act]');if(!b||!me)return;
+  var id=b.getAttribute('data-id'),a=b.getAttribute('data-act');
+  if(a==='new'){sb.from('hackathons').insert({name:'New hackathon',phase:id}).then(load)}
+  else if(a==='mod'){modalId=id;renderModal()}
+  else if(a==='close'){modalId=null;renderModal()}
+  else if(a==='post'){var ta=document.getElementById('nt'),tx=ta.value.trim();if(!tx||!modalId)return;
+    var nm=(me.user_metadata&&me.user_metadata.full_name)||me.email.split('@')[0];
+    sb.from('updates').insert({hackathon_id:modalId,body:tx,author_name:nm}).then(function(r){if(r.error)alert('Could not post the update.');else{ta.value='';load()}})}
+  else if(a==='del'){
+    if(b.getAttribute('data-arm')!=='1'){b.setAttribute('data-arm','1');b.textContent='Tap again to delete';return}
+    sb.from('hackathons').delete().eq('id',id).then(load)}
+});
+sb.auth.onAuthStateChange(function(ev,session){
+  me=session?session.user:null;
+  if(me)showApp();else{rows=[];ups=[];showAuth()}});
+})();
+</script>
+</body>
+</html>
