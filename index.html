@@ -6,11 +6,17 @@
 <title>Hackathons</title>
 <style>
 :root{--bg:#f5f5f7;--card:#fff;--ink:#1d1d1f;--mute:#86868b;--line:rgba(0,0,0,.08);--fill:rgba(0,0,0,.05);--blue:#0071e3;--red:#d70015;--scrim:rgba(0,0,0,.35);color-scheme:light dark}
-@media (prefers-color-scheme:dark){:root{--bg:#000;--card:#1c1c1e;--ink:#f5f5f7;--mute:#98989d;--line:rgba(255,255,255,.1);--fill:rgba(255,255,255,.08);--blue:#0a84ff;--red:#ff453a;--scrim:rgba(0,0,0,.6)}}
+@media (prefers-color-scheme:dark){:root:not([data-theme=light]){--bg:#000;--card:#1c1c1e;--ink:#f5f5f7;--mute:#98989d;--line:rgba(255,255,255,.1);--fill:rgba(255,255,255,.08);--blue:#0a84ff;--red:#ff453a;--scrim:rgba(0,0,0,.6)}}
+:root[data-theme=dark]{--bg:#000;--card:#1c1c1e;--ink:#f5f5f7;--mute:#98989d;--line:rgba(255,255,255,.1);--fill:rgba(255,255,255,.08);--blue:#0a84ff;--red:#ff453a;--scrim:rgba(0,0,0,.6);color-scheme:dark}
+:root[data-theme=light]{color-scheme:light}
+.theme{position:fixed;top:14px;right:14px;z-index:30;border:0;background:var(--fill);color:var(--ink);border-radius:99px;padding:6px 12px;font-size:13px;font-weight:600;cursor:pointer}
+.theme:hover{background:var(--line)}
+@media (prefers-color-scheme:dark){:root:not([data-theme=light]) .pill[data-s="In progress"]{color:#ffb340}:root:not([data-theme=light]) .pill[data-s="Submitted"]{color:#30d158}}
+:root[data-theme=dark] .pill[data-s="In progress"]{color:#ffb340}:root[data-theme=dark] .pill[data-s="Submitted"]{color:#30d158}
 *{box-sizing:border-box}
 body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.4 -apple-system,BlinkMacSystemFont,"SF Pro Text","Segoe UI","Helvetica Neue",Arial,sans-serif;-webkit-font-smoothing:antialiased;padding:32px 20px 64px}
 .wrap{max-width:1000px;margin:0 auto}
-header{display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:28px;gap:12px}
+header{padding-right:80px;display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:28px;gap:12px}
 h1{font-size:34px;letter-spacing:-.02em;font-weight:700;margin:0}
 .out{border:0;background:transparent;color:var(--blue);cursor:pointer;font-size:14px;padding:0}
 section{margin-bottom:36px}
@@ -71,6 +77,7 @@ input:focus,textarea:focus{outline:0}
 </style>
 </head>
 <body>
+<button class="theme" id="theme" aria-label="Change theme"></button>
 <div class="wrap" id="root"></div>
 <div class="ov" id="ov" hidden>
   <div class="sheet" role="dialog" aria-modal="true">
@@ -80,6 +87,16 @@ input:focus,textarea:focus{outline:0}
   </div>
 </div>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
+<script>
+(function(){
+  var b=document.getElementById('theme'),m=['system','light','dark'],L={system:'Auto',light:'Light',dark:'Dark'},t;
+  try{t=localStorage.getItem('theme')}catch(e){}
+  if(m.indexOf(t)<0)t='system';
+  function apply(){if(t==='system')document.documentElement.removeAttribute('data-theme');else document.documentElement.setAttribute('data-theme',t);b.textContent=L[t]}
+  b.onclick=function(){t=m[(m.indexOf(t)+1)%3];try{localStorage.setItem('theme',t)}catch(e){}apply()};
+  apply();
+})();
+</script>
 <script>
 // 1. Paste your Supabase values here (Project settings > API). The anon key is safe to publish.
 var SUPABASE_URL='https://gtjzvledfuluosxznujc.supabase.co';
@@ -147,7 +164,7 @@ function showApp(){
   root.innerHTML='<header><h1>Hackathons</h1><button class="out" id="out">Sign out</button></header><div id="app"><div class="msg">Loading…</div></div>';
   document.getElementById('out').onclick=function(){sb.auth.signOut()};
   sb.rpc('is_member').then(function(r){
-    if(!r.data){document.getElementById('app').innerHTML='<div class="msg">You’re signed in as '+esc(me.email)+', but this email isn’t on the team list yet. Ask Ashima to add it.</div>';return}
+    if(!r.data){document.getElementById('app').innerHTML='<div class="msg">You’re signed in as '+esc(me.email)+', but this email isn’t on the team list yet. Ask your team admin to add it.</div>';return}
     load();
     sb.channel('tracker').on('postgres_changes',{event:'*',schema:'public',table:'hackathons'},later).on('postgres_changes',{event:'*',schema:'public',table:'updates'},later).subscribe()})}
 function showAuth(msg){
