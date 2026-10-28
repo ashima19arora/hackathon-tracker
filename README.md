@@ -14,7 +14,7 @@
 
 Deadlines, registrations, tracks and progress updates for every hackathon your team is chasing, in one shared space that updates live on everyone's screen.
 
-**[Try it live](https://hackathon-winners-plum.vercel.app)** · **[Schema](schema.sql)**
+**[Try it live](https://hackathon-winners-plum.vercel.app)** 
 
 </div>
 
